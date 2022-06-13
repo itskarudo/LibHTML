@@ -44,6 +44,7 @@
 #define ON(c) if (CURRENT_CHARACTER == c)
 
 #define ON_ASCII_ALPHA if (isalpha(CURRENT_CHARACTER))
+#define ON_ASCII_LOWER_ALPHA if (islower(CURRENT_CHARACTER))
 
 #define ANYTHING_ELSE if (1)
 
@@ -253,6 +254,44 @@ Token* tokenizer_next_token(Tokenizer* t) {
         }
         break;
       }
+
+      BEGIN_STATE(RCDATA) {
+        ON('<') { SWITCH_TO(RCDATALessThanSign); }
+
+        ANYTHING_ELSE {
+          t->current_token = token_create(CharacterType);
+          token_value_append(t->current_token, CURRENT_CHARACTER);
+          EMIT_CURRENT_TOKEN;
+        }
+        break;
+      }
+
+      BEGIN_STATE(RCDATALessThanSign) {
+        ON('/') { SWITCH_TO(RCDATAEndTagOpen); }
+
+        ANYTHING_ELSE { RECONSUME_IN(RCDATA); }
+
+        break;
+      }
+
+      BEGIN_STATE(RCDATAEndTagOpen) {
+        ON_ASCII_ALPHA {
+          t->current_token = token_create(EndTagType);
+          RECONSUME_IN(RCDATAEndTagName);
+        }
+
+        break;
+      }
+
+      BEGIN_STATE(RCDATAEndTagName) {
+        ON('>') { EMIT_TOKEN_AND_SWITCH_TO(Data); }
+
+        ON_ASCII_LOWER_ALPHA {
+          token_value_append(t->current_token, CURRENT_CHARACTER);
+        }
+
+        break;
+      }
     }
   }
 }
@@ -261,3 +300,4 @@ void tokenizer_destroy(Tokenizer* tokenizer) {
   if (tokenizer->current_token != NULL) token_destroy(tokenizer->current_token);
   free(tokenizer);
 }
+

@@ -19,7 +19,11 @@
   __ENUMERATE_STATE(AttributeValueSingleQuoted) \
   __ENUMERATE_STATE(AttributeValueUnquoted)     \
   __ENUMERATE_STATE(AfterAttributeValue)        \
-  __ENUMERATE_STATE(SelfClosingStartTag)
+  __ENUMERATE_STATE(SelfClosingStartTag)        \
+  __ENUMERATE_STATE(RCDATA)                     \
+  __ENUMERATE_STATE(RCDATALessThanSign)         \
+  __ENUMERATE_STATE(RCDATAEndTagOpen)           \
+  __ENUMERATE_STATE(RCDATAEndTagName)
 
 enum TokenizerState {
 #define __ENUMERATE_STATE(x) x,
