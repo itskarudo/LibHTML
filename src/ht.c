@@ -1,8 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "Token.h"
-#include "Tokenizer.h"
+#include "Parser.h"
 
 int main(int argc, char* argv[]) {
   FILE* f = fopen("../test.html", "r");
@@ -17,15 +16,10 @@ int main(int argc, char* argv[]) {
   fclose(f);
   src[rd] = 0;
 
-  Tokenizer* tokenizer = tokenizer_create(src);
-  for (Token* token = tokenizer_next_token(tokenizer); token->type != EOFType;
-       token = tokenizer_next_token(tokenizer)) {
-    print_token(token);
+  Parser* parser = parser_create(src);
+  parser_run(parser);
 
-    token_destroy(token);
-  }
-
-  tokenizer_destroy(tokenizer);
+  parser_destroy(parser);
 
   return 0;
 }
